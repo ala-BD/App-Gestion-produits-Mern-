@@ -44,8 +44,8 @@ const produitSchema = new mongoose.Schema({
   }
 });
 
-// Methods
-produitSchema.methods.afficherDetails = function() {
+// Méthodes
+produitSchema.methods.afficherDetails = function () {
   return {
     nom: this.nom,
     description: this.description,
@@ -55,16 +55,11 @@ produitSchema.methods.afficherDetails = function() {
   };
 };
 
-produitSchema.methods.mettreAJourStock = async function(quantite) {
+produitSchema.methods.mettreAJourStock = async function (quantite) {
   this.quantiteStock = quantite;
-  if (this.quantiteStock <= 0) {
-    this.statutProduit = 'en rupture';
-  } else {
-    this.statutProduit = 'disponible';
-  }
+  this.statutProduit = quantite <= 0 ? 'en rupture' : 'disponible';
   return await this.save();
 };
 
 const Produit = mongoose.model('Produit', produitSchema);
-
-module.exports = Produit; 
+module.exports = Produit;

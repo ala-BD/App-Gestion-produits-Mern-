@@ -48,4 +48,4 @@ livraisonSchema.methods.confirmerLivraison = async function(signature) {
 
 const Livraison = mongoose.model('Livraison', livraisonSchema);
 
-module.exports = Livraison; 
+module.exports = Livraison;

@@ -26,10 +26,8 @@ const rapportSchema = new mongoose.Schema({
   }
 });
 
-// Methods
-rapportSchema.methods.genererRapport = async function() {
-  // Implementation for report generation
-  // This would typically involve gathering data and generating a PDF
+// Méthode personnalisée pour simuler la génération de rapport
+rapportSchema.methods.genererRapport = async function () {
   return {
     type: this.typeRapport,
     periode: this.periode,
@@ -38,5 +36,4 @@ rapportSchema.methods.genererRapport = async function() {
 };
 
 const Rapport = mongoose.model('Rapport', rapportSchema);
-
-module.exports = Rapport; 
+module.exports = Rapport;

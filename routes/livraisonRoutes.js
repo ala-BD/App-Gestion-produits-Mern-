@@ -10,15 +10,15 @@ const {
   confirmerLivraison
 } = require('../controllers/livraisonController');
 
-// Routes CRUD pour les livraisons
+// Routes CRUD
 router.get('/', getLivraisons);
 router.get('/:id', getLivraisonById);
 router.post('/', createLivraison);
 router.put('/:id', updateLivraison);
 router.delete('/:id', deleteLivraison);
 
-// Routes spécifiques aux livraisons
+// Routes spécifiques
 router.get('/:id/statut', suivreStatutLivraison);
 router.post('/:id/confirmer', confirmerLivraison);
 
-module.exports = router; 
+module.exports = router;

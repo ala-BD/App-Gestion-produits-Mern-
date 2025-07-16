@@ -26,11 +26,27 @@ const getProduitById = async (req, res) => {
 // Créer un produit
 const createProduit = async (req, res) => {
   try {
-    const produit = new Produit(req.body);
-    await produit.save();
-    res.status(201).json(produit);
-  } catch (error) {
-    res.status(400).json({ message: 'Erreur lors de la création', error: error.message });
+    const { nom, description, prix, quantiteStock, typeProduit, imageURL, categorie } = req.body;
+
+    const existingProduit = await Produit.findOne({ nom });
+    if (existingProduit) {
+      return res.status(400).json({ message: 'Un produit avec ce nom existe déjà.' });
+    }
+
+    const newProduit = new Produit({
+      nom,
+      description,
+      prix,
+      quantiteStock,
+      typeProduit,
+      imageURL,
+      categorie
+    });
+
+    await newProduit.save();
+    res.status(201).json({ message: 'Produit créé avec succès.', produit: newProduit });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.', error: err.message });
   }
 };
 
@@ -71,8 +87,10 @@ const updateStock = async (req, res) => {
     if (!produit) {
       return res.status(404).json({ message: 'Produit non trouvé' });
     }
-    await produit.mettreAJourStock(req.body.quantite);
-    res.json(produit);
+
+    const { quantite } = req.body;
+    await produit.mettreAJourStock(quantite);
+    res.json({ message: 'Stock mis à jour', produit });
   } catch (error) {
     res.status(400).json({ message: 'Erreur lors de la mise à jour du stock', error: error.message });
   }
@@ -85,4 +103,4 @@ module.exports = {
   updateProduit,
   deleteProduit,
   updateStock
-}; 
+};

@@ -27,18 +27,34 @@ const getLivraisonById = async (req, res) => {
 // Créer une livraison
 const createLivraison = async (req, res) => {
   try {
-    const livraison = new Livraison(req.body);
-    await livraison.save();
+    const { commande, dateLivraisonPrevue, notesLivreur } = req.body;
+
+    // Vérifier si une livraison existe déjà pour cette commande
+    const existingLivraison = await Livraison.findOne({ commande });
+    if (existingLivraison) {
+      return res.status(400).json({ message: 'Une livraison existe déjà pour cette commande.' });
+    }
+
+    // Créer une nouvelle livraison
+    const newLivraison = new Livraison({
+      commande,
+      dateLivraisonPrevue,
+      notesLivreur
+    });
+
+    // Sauvegarder la livraison
+    await newLivraison.save();
 
     // Mettre à jour le statut de la commande
     await Commande.findByIdAndUpdate(
-      livraison.commande,
+      commande,
       { statutCommande: 'en préparation' }
     );
 
-    res.status(201).json(livraison);
-  } catch (error) {
-    res.status(400).json({ message: 'Erreur lors de la création', error: error.message });
+    res.status(201).json({ message: 'Livraison créée avec succès.', livraison: newLivraison });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur.' });
   }
 };
 
@@ -115,4 +131,4 @@ module.exports = {
   deleteLivraison,
   suivreStatutLivraison,
   confirmerLivraison
-}; 
+};

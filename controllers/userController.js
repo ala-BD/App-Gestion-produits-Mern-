@@ -1,7 +1,4 @@
 const User = require('../models/User');
-const Admin = require('../models/Admin');
-const Client = require('../models/Client');
-const Fournisseur = require('../models/Fournisseur');
 
 // Obtenir tous les utilisateurs
 const getUsers = async (req, res) => {
@@ -17,39 +14,27 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
 
-// Créer un utilisateur (admin, client ou fournisseur)
+// Créer un utilisateur
 const createUser = async (req, res) => {
   try {
-    const { role, ...userData } = req.body;
-    let user;
+    const { nom, prenom, email, mdp, adresse, role } = req.body;
 
-    switch (role) {
-      case 'admin':
-        user = new Admin(userData);
-        break;
-      case 'client':
-        user = new Client(userData);
-        break;
-      case 'fournisseur':
-        user = new Fournisseur(userData);
-        break;
-      default:
-        return res.status(400).json({ message: 'Role invalide' });
-    }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'Email déjà utilisé.' });
 
-    await user.save();
-    res.status(201).json(user);
+    const newUser = new User({ nom, prenom, email, mdp, adresse, role });
+    await newUser.save();
+
+    res.status(201).json({ message: 'Utilisateur créé avec succès', user: newUser });
   } catch (error) {
-    res.status(400).json({ message: 'Erreur lors de la création', error: error.message });
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
 
@@ -61,9 +46,7 @@ const updateUser = async (req, res) => {
       { $set: req.body },
       { new: true, runValidators: true }
     );
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
     res.json(user);
   } catch (error) {
     res.status(400).json({ message: 'Erreur lors de la mise à jour', error: error.message });
@@ -74,9 +57,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
     res.json({ message: 'Utilisateur supprimé avec succès' });
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la suppression', error: error.message });
@@ -89,4 +70,4 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser
-}; 
+};

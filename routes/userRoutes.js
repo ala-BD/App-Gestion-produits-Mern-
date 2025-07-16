@@ -8,11 +8,12 @@ const {
   deleteUser
 } = require('../controllers/userController');
 
-// Routes CRUD pour les utilisateurs
+// Routes CRUD utilisateurs
 router.get('/', getUsers);
 router.get('/:id', getUserById);
 router.post('/', createUser);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
 
-module.exports = router; 
+module.exports = router;
+ 

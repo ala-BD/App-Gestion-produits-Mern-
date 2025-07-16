@@ -26,11 +26,27 @@ const getAlerteById = async (req, res) => {
 // Créer une alerte
 const createAlerte = async (req, res) => {
   try {
-    const alerte = new AlerteStock(req.body);
-    await alerte.save();
-    res.status(201).json(alerte);
-  } catch (error) {
-    res.status(400).json({ message: 'Erreur lors de la création', error: error.message });
+    const { produit, seuilMinimum } = req.body;
+
+    // Vérifier si une alerte existe déjà pour ce produit
+    const existingAlerte = await AlerteStock.findOne({ produit, statutAlerte: 'active' });
+    if (existingAlerte) {
+      return res.status(400).json({ message: 'Une alerte active existe déjà pour ce produit.' });
+    }
+
+    // Créer une nouvelle alerte
+    const newAlerte = new AlerteStock({
+      produit,
+      seuilMinimum
+    });
+
+    // Sauvegarder l'alerte
+    await newAlerte.save();
+
+    res.status(201).json({ message: 'Alerte créée avec succès.', alerte: newAlerte });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur.' });
   }
 };
 

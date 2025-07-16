@@ -26,11 +26,29 @@ const getCategorieById = async (req, res) => {
 // Créer une catégorie
 const createCategorie = async (req, res) => {
   try {
-    const categorie = new Categorie(req.body);
-    await categorie.save();
-    res.status(201).json(categorie);
-  } catch (error) {
-    res.status(400).json({ message: 'Erreur lors de la création', error: error.message });
+    const { nomCategorie, descriptionCategorie, typeCategorie, imageCategorie } = req.body;
+
+    // Vérifier si la catégorie existe déjà
+    const existingCategorie = await Categorie.findOne({ nomCategorie });
+    if (existingCategorie) {
+      return res.status(400).json({ message: 'Une catégorie avec ce nom existe déjà.' });
+    }
+
+    // Créer une nouvelle catégorie
+    const newCategorie = new Categorie({
+      nomCategorie,
+      descriptionCategorie,
+      typeCategorie,
+      imageCategorie
+    });
+
+    // Sauvegarder la catégorie
+    await newCategorie.save();
+
+    res.status(201).json({ message: 'Catégorie créée avec succès.', categorie: newCategorie });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur.' });
   }
 };
 

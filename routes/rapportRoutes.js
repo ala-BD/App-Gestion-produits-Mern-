@@ -15,8 +15,6 @@ router.get('/:id', getRapportById);
 router.post('/', createRapport);
 router.put('/:id', updateRapport);
 router.delete('/:id', deleteRapport);
-
-// Route pour générer un rapport
 router.post('/:id/generer', genererRapport);
 
-module.exports = router; 
+module.exports = router;

@@ -31,18 +31,46 @@ const getCommandeById = async (req, res) => {
 // Créer une commande
 const createCommande = async (req, res) => {
   try {
-    const commande = new Commande(req.body);
-    await commande.save();
+    const {
+      numeroCommande,
+      client,
+      lignesCommande,
+      totalCommande,
+      taxesAppliquees,
+      adresseLivraison,
+      modePaiement
+    } = req.body;
+
+    // Vérifier si la commande existe déjà
+    const existingCommande = await Commande.findOne({ numeroCommande });
+    if (existingCommande) {
+      return res.status(400).json({ message: 'Une commande avec ce numéro existe déjà.' });
+    }
+
+    // Créer une nouvelle commande
+    const newCommande = new Commande({
+      numeroCommande,
+      client,
+      lignesCommande,
+      totalCommande,
+      taxesAppliquees,
+      adresseLivraison,
+      modePaiement
+    });
+
+    // Sauvegarder la commande
+    await newCommande.save();
 
     // Mettre à jour l'historique des commandes du client
     await Client.findByIdAndUpdate(
-      commande.client,
-      { $push: { historiqueCommandes: commande._id } }
+      client,
+      { $push: { historiqueCommandes: newCommande._id } }
     );
 
-    res.status(201).json(commande);
-  } catch (error) {
-    res.status(400).json({ message: 'Erreur lors de la création', error: error.message });
+    res.status(201).json({ message: 'Commande créée avec succès.', commande: newCommande });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur.', error: err.message });
   }
 };
 
@@ -90,7 +118,10 @@ const updateStatutCommande = async (req, res) => {
     if (!commande) {
       return res.status(404).json({ message: 'Commande non trouvée' });
     }
+
+    // Supposons que la méthode changerStatut est définie dans ton modèle Commande
     await commande.changerStatut(req.body.statut);
+
     res.json(commande);
   } catch (error) {
     res.status(400).json({ message: 'Erreur lors du changement de statut', error: error.message });
@@ -104,7 +135,10 @@ const annulerCommande = async (req, res) => {
     if (!commande) {
       return res.status(404).json({ message: 'Commande non trouvée' });
     }
+
+    // Supposons que la méthode annulerCommande est définie dans ton modèle Commande
     await commande.annulerCommande();
+
     res.json({ message: 'Commande annulée avec succès' });
   } catch (error) {
     res.status(400).json({ message: 'Erreur lors de l\'annulation', error: error.message });
@@ -119,4 +153,4 @@ module.exports = {
   deleteCommande,
   updateStatutCommande,
   annulerCommande
-}; 
+};
