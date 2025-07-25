@@ -1,4 +1,30 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+
+// Connexion utilisateur (exemple)
+const login = async (req, res) => {
+  const { email, mdp } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user || !(await user.seConnecter(mdp))) {
+      return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+    }
+
+    // Génération du token JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    res.status(200).json({ token, user });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur', error: err.message });
+  }
+};
+
+
 
 // Obtenir tous les utilisateurs
 const getUsers = async (req, res) => {
@@ -66,6 +92,7 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
   getUsers,
+  login, 
   getUserById,
   createUser,
   updateUser,
