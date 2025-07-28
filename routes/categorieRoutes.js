@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { authenticateToken, authorizeRole } = require('../middlewares/auth.js');
 const {
   getCategories,
   getCategorieById,
@@ -11,10 +12,10 @@ const {
 
 // Routes CRUD pour les catégories
 router.get('/', getCategories);
-router.get('/:id', getCategorieById);
-router.post('/', createCategorie);
-router.put('/:id', updateCategorie);
-router.delete('/:id', deleteCategorie);
+router.get('/:id',authorizeRole(['admin']), getCategorieById);
+router.post('/',authenticateToken,authorizeRole(['admin']), createCategorie);
+router.put('/:id',authorizeRole(['admin']), updateCategorie);
+router.delete('/:id',authorizeRole(['admin']), deleteCategorie);
 router.get('/:id/produits', getProduitsByCategorie);
 
 module.exports = router; 

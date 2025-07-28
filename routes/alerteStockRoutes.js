@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { authenticateToken, authorizeRole } = require('../middlewares/auth.js');
 const {
   getAlertes,
   getAlerteById,
@@ -11,7 +12,7 @@ const {
 } = require('../controllers/alerteStockController');
 
 // Routes CRUD pour les alertes de stock
-router.get('/', getAlertes);
+router.get('/',authenticateToken,authorizeRole(['admin']), getAlertes);
 router.get('/:id', getAlerteById);
 router.post('/', createAlerte);
 router.put('/:id', updateAlerte);
@@ -19,6 +20,6 @@ router.delete('/:id', deleteAlerte);
 
 // Routes spécifiques aux alertes
 router.post('/:id/declencher', declencherAlerte);
-router.post('/:id/resoudre', resoudreAlerte);
+router.put('/:id/resoudre',authenticateToken,authorizeRole(['admin']), resoudreAlerte);
 
 module.exports = router; 

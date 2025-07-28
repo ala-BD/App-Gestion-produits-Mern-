@@ -14,11 +14,10 @@ const {
 router.post('/login', login);
 
 // Routes CRUD utilisateurs
-router.get('/',authenticateToken, authorizeRole(['admin', 'client']), getUsers);
-router.get('/:id',authenticateToken, authorizeRole(['admin', 'client']), getUserById);
-router.post('/', createUser);
-router.put('/:id', updateUser);
+router.get('/',authenticateToken, authorizeRole(['admin']), getUsers);
+router.get('/:id',getUserById);
+router.post('/',authenticateToken, authorizeRole(['admin']), createUser);
+router.put('/:id',authenticateToken, updateUser);
 router.delete('/:id',authenticateToken, authorizeRole(['admin']), deleteUser);
 
 module.exports = router;
- 

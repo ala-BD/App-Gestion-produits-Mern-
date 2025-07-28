@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { authenticateToken, authorizeRole } = require('../middlewares/auth.js');
 const {
   getRapports,
   getRapportById,
@@ -15,6 +16,6 @@ router.get('/:id', getRapportById);
 router.post('/', createRapport);
 router.put('/:id', updateRapport);
 router.delete('/:id', deleteRapport);
-router.post('/:id/generer', genererRapport);
+router.post('/:id/generer',authenticateToken,authorizeRole(['admin']), genererRapport);
 
 module.exports = router;

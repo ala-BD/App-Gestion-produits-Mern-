@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { authenticateToken, authorizeRole } = require('../middlewares/auth.js');
 const {
   getCommandes,
   getCommandeById,
@@ -11,9 +12,9 @@ const {
 } = require('../controllers/commandeController');
 
 // Routes CRUD pour les commandes
-router.get('/', getCommandes);
-router.get('/:id', getCommandeById);
-router.post('/', createCommande);
+router.get('/',authenticateToken,authorizeRole(['fournisseur']), getCommandes);
+router.get('/:id',authenticateToken,authorizeRole(['client']), getCommandeById);
+router.post('/',authenticateToken,authorizeRole(['client']), createCommande);
 router.put('/:id', updateCommande);
 router.delete('/:id', deleteCommande);
 
